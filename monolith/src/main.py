@@ -8,7 +8,7 @@ from src.common.logger import setup_logging
 from src.api.v1.routers import (
     auth, identity, courses, videos, assessments, learning_paths,
     user_progress, search, recommendations, discussions,
-    subscriptions, billing, notifications
+    subscriptions, billing, notifications, progress
 )
 from src.api.v1.routers.admin import dashboard, users, courses as admin_courses, settings as admin_settings
 
@@ -47,6 +47,7 @@ app.include_router(videos.router, prefix="/api/v1", tags=["Videos"])
 app.include_router(assessments.router, prefix="/api/v1", tags=["Assessments"])
 app.include_router(learning_paths.router, prefix="/api/v1", tags=["Learning Paths"])
 app.include_router(user_progress.router, prefix="/api/v1", tags=["User Progress"])
+app.include_router(progress.router, prefix="/api/v1", tags=["Progress Tracking"])
 app.include_router(search.router, prefix="/api/v1", tags=["Search"])
 app.include_router(recommendations.router, prefix="/api/v1", tags=["Recommendations"])
 app.include_router(discussions.router, prefix="/api/v1", tags=["Discussions"])
