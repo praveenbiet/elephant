@@ -1,0 +1,59 @@
+# FastAPI and web server
+fastapi==0.100.0
+uvicorn[standard]==0.23.1
+pydantic==2.0.3
+pydantic-settings==2.0.2
+python-multipart==0.0.6
+email-validator==2.0.0.post2
+
+# Database
+sqlalchemy==2.0.19
+alembic==1.11.1
+asyncpg==0.28.0
+psycopg2-binary==2.9.6
+greenlet==2.0.2
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+
+# Caching and rate limiting
+redis==4.6.0
+hiredis==2.2.3
+
+# Event handling
+aiokafka==0.8.1
+
+# Networking and HTTP client
+httpx==0.24.1
+aiohttp==3.8.5
+
+# File handling and validation
+python-magic==0.4.27
+python-slugify==8.0.1
+validators==0.20.0
+
+# AWS
+boto3==1.28.17
+botocore==1.31.17
+
+# Date handling
+pytz==2023.3
+
+# Analytics and monitoring
+prometheus-client==0.17.1
+structlog==23.1.0
+
+# Testing
+pytest==7.4.0
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+black==23.7.0
+flake8==6.1.0
+isort==5.12.0
+mypy==1.4.1
+
+# Development
+python-dotenv==1.0.0
