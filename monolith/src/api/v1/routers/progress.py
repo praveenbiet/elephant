@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,14 +49,7 @@ async def get_lesson_progress(
             "last_position_seconds": 0
         }
         
-    return {
-        "lesson_id": progress.lesson_id,
-        "progress_percentage": progress.progress_percentage,
-        "status": progress.status,
-        "last_position_seconds": progress.last_position_seconds,
-        "completed_at": progress.completed_at,
-        "last_activity_at": progress.last_activity_at
-    }
+    return progress
 
 @router.post("/lesson/{lesson_id}/update", response_model=LessonProgressResponse)
 async def update_lesson_progress(
@@ -81,14 +74,7 @@ async def update_lesson_progress(
             detail="Failed to update lesson progress"
         )
         
-    return {
-        "lesson_id": updated_progress.lesson_id,
-        "progress_percentage": updated_progress.progress_percentage,
-        "status": updated_progress.status,
-        "last_position_seconds": updated_progress.last_position_seconds,
-        "completed_at": updated_progress.completed_at,
-        "last_activity_at": updated_progress.last_activity_at
-    }
+    return updated_progress
 
 @router.post("/lesson/{lesson_id}/complete", response_model=LessonProgressResponse)
 async def complete_lesson(
@@ -109,14 +95,7 @@ async def complete_lesson(
             detail="Failed to mark lesson as completed"
         )
         
-    return {
-        "lesson_id": completed_progress.lesson_id,
-        "progress_percentage": completed_progress.progress_percentage,
-        "status": completed_progress.status,
-        "completed_at": completed_progress.completed_at,
-        "last_activity_at": completed_progress.last_activity_at,
-        "last_position_seconds": completed_progress.last_position_seconds
-    }
+    return completed_progress
 
 @router.post("/lesson/{lesson_id}/reset", response_model=LessonProgressResponse)
 async def reset_lesson_progress(
@@ -137,14 +116,7 @@ async def reset_lesson_progress(
             detail="No progress found to reset"
         )
         
-    return {
-        "lesson_id": reset_progress.lesson_id,
-        "progress_percentage": reset_progress.progress_percentage,
-        "status": reset_progress.status,
-        "last_position_seconds": reset_progress.last_position_seconds,
-        "last_activity_at": reset_progress.last_activity_at,
-        "completed_at": reset_progress.completed_at
-    }
+    return reset_progress
 
 @router.get("/course/{course_id}", response_model=CourseProgressResponse)
 async def get_course_progress(
@@ -179,40 +151,13 @@ async def get_course_progress(
     # Get progress details
     progress = await progress_service.get_course_progress(current_user["id"], course_id)
     
-    return {
-        "course": {
-            "id": course.id,
-            "title": course.title,
-            "image_url": course.image_url
-        },
-        "overall_percentage": progress["overall_percentage"],
-        "status_counts": progress["status_counts"],
-        "section_progress": [
-            {
-                "section_id": sp["section"].id,
-                "title": sp["section"].title,
-                "progress_percentage": sp["progress_percentage"],
-                "lessons": [
-                    {
-                        "lesson_id": lp["lesson"].id,
-                        "title": lp["lesson"].title,
-                        "type": lp["lesson"].type,
-                        "status": lp["progress"].status if lp["progress"] else "not_started",
-                        "progress_percentage": lp["progress"].progress_percentage if lp["progress"] else 0.0,
-                        "last_position_seconds": lp["progress"].last_position_seconds if lp["progress"] else 0
-                    }
-                    for lp in sp["lessons"]
-                ]
-            }
-            for sp in progress["section_progress"]
-        ],
-        "enrollment": {
-            "status": progress["enrollment"].status,
-            "progress_percentage": progress["enrollment"].progress_percentage,
-            "completed_at": progress["enrollment"].completed_at,
-            "certificate_id": progress["enrollment"].certificate_id
-        } if progress["enrollment"] else None
-    }
+    if not progress:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Failed to retrieve course progress"
+        )
+    
+    return progress
 
 @router.get("/section/{section_id}", response_model=SectionProgressResponse)
 async def get_section_progress(
@@ -251,13 +196,16 @@ async def get_section_progress(
 @router.get("/recent-activity", response_model=RecentActivityResponse)
 async def get_recent_activity(
     limit: int = Query(5, gt=0, le=20, description="Number of activities to return"),
+    days: int = Query(7, gt=0, le=30, description="Number of days to look back"),
     progress_service: ProgressService = Depends(get_progress_service),
     current_user: Dict[str, Any] = Depends(get_current_active_user)
 ):
     """
     Get user's recent learning activity across all courses.
     """
-    activities = await progress_service.get_recent_activity(current_user["id"], limit)
+    activities = await progress_service.get_recent_activity(
+        current_user["id"], limit, days
+    )
     
     return {
         "activities": activities

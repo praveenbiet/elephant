@@ -7,7 +7,7 @@ from src.modules.courses.domain.progress import ProgressStatus
 
 class LessonProgressModel(Base):
     """
-    Database model for tracking lesson progress.
+    Database model for lesson progress.
     """
     __tablename__ = "lesson_progress"
 
@@ -23,7 +23,7 @@ class LessonProgressModel(Base):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    lesson = relationship("LessonModel", back_populates="progress_records")
+    lesson = relationship("LessonModel", back_populates="progress")
 
     def __repr__(self):
-        return f"<LessonProgress(id={self.id}, user_id={self.user_id}, lesson_id={self.lesson_id}, status={self.status})>" 
+        return f"<LessonProgress(id={self.id}, user_id={self.user_id}, lesson_id={self.lesson_id}, status={self.status}, progress={self.progress_percentage}%)>" 
