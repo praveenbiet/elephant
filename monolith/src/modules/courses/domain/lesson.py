@@ -4,14 +4,14 @@ from typing import List, Dict, Any, Optional
 from enum import Enum
 
 class LessonType(str, Enum):
-    """Type of lesson content."""
+    """Lesson types in the platform."""
     VIDEO = "video"
-    TEXT = "text"
+    READING = "reading"
     QUIZ = "quiz"
     ASSIGNMENT = "assignment"
     DISCUSSION = "discussion"
-    RESOURCE = "resource"
-    OTHER = "other"
+    CODE_LAB = "code_lab"
+    PRESENTATION = "presentation"
 
 @dataclass
 class Lesson:
